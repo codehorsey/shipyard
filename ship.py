@@ -16,11 +16,10 @@ class Machine():
         
 
 class Container():
-    type_of_containers = ('normal', 'heavy', 'refridge')
-    type_of_container = 'None'
+    type_of_containers = {0:'normal', 1:'heavy', 2:'refridge'}
 
     def __init__(self, container_type=0):
-        # 0 = Normal 1 = Heavy 2 = Redrige
+        
         self.type_of_container = self.type_of_containers[container_type]
 
     def __str__(self):
@@ -28,13 +27,13 @@ class Container():
 
 class Truck():
 
-    def __init__(self, n,h,r):
+    def __init__(self, accepted_loads):
         self.freight = list()
         self.accepts = dict()
 
-        self.accepts['normal'] = n
-        self.accepts['heavy'] = h
-        self.accepts['refridge'] = r
+        self.accepts['normal'] = accepted_loads[0]
+        self.accepts['heavy'] = accepted_loads[1]
+        self.accepts['refridge'] = accepted_loads[2]
 
     def has_room(self):
         return len(self.freight) <= 3
@@ -46,10 +45,15 @@ class Truck():
         return str(len(self.freight))
 
 
+normal_load = [3,0,0]
+heavy_load = [0,3,0]
+refridgerated_load = [0,0,3]
+mixed_load = [1,1,0]
+
 m = Machine()
 c = Container(0)
-t = Truck(2,0,0)
-tt = Truck(0,5,2)
+t = Truck(normal_load)
+tt = Truck(heavy_load)
 h = Container(1)
 
 def app(m, c, t):
