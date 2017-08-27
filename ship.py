@@ -16,19 +16,28 @@ class Machine():
         
 
 class Container():
+    type_of_containers = ('normal', 'heavy', 'refridge')
+    type_of_container = 'None'
 
-    type_of_container = 'normal'
+    def __init__(self, container_type=0):
+        # 0 = Normal 1 = Heavy 2 = Redrige
+        self.type_of_container = self.type_of_containers[container_type]
 
     def __str__(self):
         return self.type_of_container
 
 class Truck():
 
-    freight = list()
-    limit_of_freight = 10
+    def __init__(self, n,h,r):
+        self.freight = list()
+        self.accepts = dict()
+
+        self.accepts['normal'] = n
+        self.accepts['heavy'] = h
+        self.accepts['refridge'] = r
 
     def has_room(self):
-        return len(self.freight) <= 10
+        return len(self.freight) <= 3
 
     def load_freight(self, freight):
         self.freight.append(freight)
@@ -38,17 +47,19 @@ class Truck():
 
 
 m = Machine()
-c = Container()
-t = Truck()
-
-m.load_container(c)
+c = Container(0)
+t = Truck(2,0,0)
+tt = Truck(0,5,2)
+h = Container(1)
 
 def app(m, c, t):
-    if t.has_room():
-        # if truck has room for containers
-        # get container, load onto truck, reset machine
+    m.load_container(c)      
+
+    if t.accepts[c.type_of_container] > 0:
+        # if truck accepts type of container
+
+
+        # get container, load onto truck, minus inventory, reset machine
         container = m.unload_container()
         t.load_freight(container)
-        m.reset()
-
-
+        t.accepts[container.type_of_container] -= 1
