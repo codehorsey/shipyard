@@ -16,7 +16,8 @@ class Person():
     
     def unload_pockets(self, truck):
         logger.info("{} unloading pockets".format(self.id))
-
+        print truck.accepts
+        print self.pockets
         if isinstance(truck, Truck) and truck.eligable_thing(self.pockets[1]):
                 logger.debug("Truck accepts {}".format(self.pockets[1]))
                 truck.take_thing(self.pockets[1])
@@ -57,6 +58,12 @@ class Truck():
         self.accepts = acceptable_things
         self.inventory = []
 
+    def still_room(self):
+        a = []
+        for k, v in self.accepts.items():
+            a.append(v>0)
+        return True in a
+
     def eligable_thing(self, thing):
         """Checks to see if has too many of thing and if thing can be added.
         
@@ -91,9 +98,12 @@ carrot = Thing('carrot')
 watermelon = Thing('watermelon')
 
 normal_load = {'apple':3,'carrot':1}
-heavy_load = {'watermelon':3}
+medium_load = {'apple':2,'carrot':2}
+heavy_load = {'watermelon':2}
 t = Truck(normal_load)
 d = Truck(heavy_load)
+h = Truck(medium_load)
+
 p = Person()
 helpers = list()
 import random
@@ -101,7 +111,7 @@ import random
 items = ['carrot', 'apple', 'watermelon']
 foods = list()
 
-for _ in range(50):
+for _ in range(10):
     foods.append(Thing(random.choice(items)))
 
 for _ in range(3):
@@ -110,8 +120,29 @@ for _ in range(3):
 for helper in helpers:
     helper.pickup_thing(random.choice(foods))
 
-for helper in helpers:
-    if not helper.unload_pockets(t):
-        helper.avoid_items.append(helper.pockets)
-        good_choice = random.choice(filter(lambda x: x not in helper.avoid_items, foods))
-        helper.pickup_thing(good_choice)
+def load_the_truck(helpers, truck):
+    for helper in helpers:
+        '''
+        if helper cant unload pockets because truck doesnt accept load
+        helper adds thing to list of items to avoid picking up in the future
+        helper picks up a new item not of type that didnt work
+        '''
+        if not helper.unload_pockets(truck):
+            helper.avoid_items.append(helper.pockets[1])
+            good_choices = filter(lambda x: x.name not in helper.avoid_items, foods)
+            helper.pickup_thing(random.choice(good_choices))
+        else:
+            helper.pickup_thing(random.choice(foods))
+
+    
+print t.accepts
+i = 0
+while t.still_room():
+    print i
+    load_the_truck(helpers,t)
+    print "----------"
+    print t.accepts
+    print "----------"
+
+    i += 1
+
