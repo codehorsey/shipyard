@@ -2,26 +2,33 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+import random
 class Person():
 
     def __init__(self):
-        pass
+        self.id = random.randrange(1,500)
+        self.avoid_items = []
 
     def pickup_thing(self, thing):
-        self.pockets = thing
-        logger.debug('Person picked up {}.'.format(thing))
+        self.pockets = (thing, thing.name)
+        
+        logger.debug('{} picked up {}.'.format(self.id, thing))
     
     def unload_pockets(self, truck):
-        logger.info("Person unloading pockets")
-        if isinstance(truck, Truck) and truck.eligable_thing(self.pockets):
-                logger.debug("Truck accepts {}".format(self.pockets))
-                truck.take_thing(self.pockets)
+        logger.info("{} unloading pockets".format(self.id))
+
+        if isinstance(truck, Truck) and truck.eligable_thing(self.pockets[1]):
+                logger.debug("Truck accepts {}".format(self.pockets[1]))
+                truck.take_thing(self.pockets[1])
                 self.pockets = None
                 logger.debug("Pockets are empty")
+                return True
         elif not isinstance(truck, Truck):
             logger.error("Wrong class! {} not accepted".format(truck.__class__))
+            return False
         else:
-            logger.debug("Truck does not accept {}".format(self.pockets))
+            logger.debug("Truck does not accept {}".format(self.pockets[1]))
+            return False
 
 
     def unload_thing(self, thing, truck):
@@ -35,11 +42,14 @@ class Person():
         if isinstance(truck, Truck) and truck.eligable_thing(thing):
                 logger.debug("Truck accepts {}".format(thing))
                 truck.take_thing(thing)
+                return True
                 
         elif not isinstance(truck, Truck):
             logger.error("Wrong class! {} not accepted".format(truck.__class__))
+            return False
         else:
             logger.debug("Truck does not accept {}".format(thing))
+            return False
 
 class Truck():
 
@@ -68,23 +78,40 @@ class Truck():
         self.accepts[thing] -= 1
         logger.debug('Added {} to truck inventory. Room for {} more.'.format(thing, self.accepts[thing]))
 
+class Thing():
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+apple = Thing('apple')
+carrot = Thing('carrot')
+watermelon = Thing('watermelon')
+
 normal_load = {'apple':3,'carrot':1}
 heavy_load = {'watermelon':3}
 t = Truck(normal_load)
 d = Truck(heavy_load)
 p = Person()
+helpers = list()
+import random
 
-p.unload_thing('ban', t)
-p.unload_thing('carrot', t)
-p.unload_thing('apple', t)
-p.unload_thing('apple', t)
-p.unload_thing('apple', t)
-p.unload_thing('apple', t)
-p.unload_thing('apple', d)
+items = ['carrot', 'apple', 'watermelon']
+foods = list()
 
-p.pickup_thing('watermelon')
-p.unload_pockets(t)
-p.unload_pockets(d)
+for _ in range(50):
+    foods.append(Thing(random.choice(items)))
 
-print p.pockets
-print t.inventory
+for _ in range(3):
+    helpers.append(Person())
+
+for helper in helpers:
+    helper.pickup_thing(random.choice(foods))
+
+for helper in helpers:
+    if not helper.unload_pockets(t):
+        helper.avoid_items.append(helper.pockets)
+        good_choice = random.choice(filter(lambda x: x not in helper.avoid_items, foods))
+        helper.pickup_thing(good_choice)
