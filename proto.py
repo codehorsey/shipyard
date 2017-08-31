@@ -1,5 +1,5 @@
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=40)
 logger = logging.getLogger(__name__)
 
 import random
@@ -16,8 +16,7 @@ class Person():
     
     def unload_pockets(self, truck):
         logger.info("{} unloading pockets".format(self.id))
-        print truck.accepts
-        print self.pockets
+     
         if isinstance(truck, Truck) and truck.eligable_thing(self.pockets[1]):
                 logger.debug("Truck accepts {}".format(self.pockets[1]))
                 truck.take_thing(self.pockets[1])
@@ -99,10 +98,12 @@ watermelon = Thing('watermelon')
 
 normal_load = {'apple':3,'carrot':1}
 medium_load = {'apple':2,'carrot':2}
+insane_load = {'apple':25,'carrot':13, 'watermelon':10}
 heavy_load = {'watermelon':2}
 t = Truck(normal_load)
 d = Truck(heavy_load)
 h = Truck(medium_load)
+insanetruck = Truck(insane_load)
 
 p = Person()
 helpers = list()
@@ -111,10 +112,10 @@ import random
 items = ['carrot', 'apple', 'watermelon']
 foods = list()
 
-for _ in range(10):
+for _ in range(100):
     foods.append(Thing(random.choice(items)))
 
-for _ in range(3):
+for _ in range(5):
     helpers.append(Person())
 
 for helper in helpers:
@@ -130,19 +131,23 @@ def load_the_truck(helpers, truck):
         if not helper.unload_pockets(truck):
             helper.avoid_items.append(helper.pockets[1])
             good_choices = filter(lambda x: x.name not in helper.avoid_items, foods)
-            helper.pickup_thing(random.choice(good_choices))
+           
+            try:
+                helper.pickup_thing(random.choice(good_choices))
+            except IndexError:
+                logging.error('No more good_choices')
         else:
             helper.pickup_thing(random.choice(foods))
 
     
-print t.accepts
 i = 0
-while t.still_room():
+while insanetruck.still_room() or i >= 500:
     print i
-    load_the_truck(helpers,t)
+    load_the_truck(helpers,insanetruck)
     print "----------"
-    print t.accepts
+    print insanetruck.accepts
     print "----------"
 
     i += 1
+
 
