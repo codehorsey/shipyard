@@ -1,8 +1,8 @@
+import random
 import logging
 logging.basicConfig(level=10)
 logger = logging.getLogger(__name__)
 
-import random
 class Person():
 
     def __init__(self):
@@ -77,35 +77,9 @@ class Thing():
     def __str__(self):
         return self.name
 
-apple = Thing('apple')
-carrot = Thing('carrot')
-watermelon = Thing('watermelon')
 
-normal_load = {'apple':3,'carrot':1}
-medium_load = {'apple':2,'carrot':2}
-insane_load = {'apple':25,'carrot':13, 'watermelon':10}
-heavy_load = {'watermelon':2}
-t = Truck(normal_load)
-d = Truck(heavy_load)
-h = Truck(medium_load)
-insanetruck = Truck(insane_load)
-
-p = Person()
-helpers = list()
-
-items = ['carrot', 'apple', 'watermelon']
-foods = list()
-
-for _ in range(100):
-    foods.append(Thing(random.choice(items)))
-
-for _ in range(5):
-    helpers.append(Person())
-
-for helper in helpers:
-    helper.pickup_thing(random.choice(foods))
-
-def load_the_truck(helpers, truck):
+def load_the_truck(helpers, truck, pile_of_foods):
+    foods = pile_of_foods
     for helper in helpers:
         '''
         if helper cant unload pockets because truck doesnt accept load
@@ -124,14 +98,46 @@ def load_the_truck(helpers, truck):
             helper.pickup_thing(random.choice(foods))
 
     
-i = 0
-while insanetruck.still_room() and i <= 10:
-    print i
-    load_the_truck(helpers,insanetruck)
-    print "----------"
-    print insanetruck.accepts
-    print "----------"
 
-    i += 1
+def main():
 
+    apple = Thing('apple')
+    carrot = Thing('carrot')
+    watermelon = Thing('watermelon')
 
+    normal_load = {'apple':3,'carrot':1}
+    medium_load = {'apple':2,'carrot':2}
+    insane_load = {'apple':25,'carrot':13, 'watermelon':10}
+    heavy_load = {'watermelon':2}
+    t = Truck(normal_load)
+    d = Truck(heavy_load)
+    h = Truck(medium_load)
+    insanetruck = Truck(insane_load)
+
+    p = Person()
+    helpers = list()
+
+    items = ['carrot', 'apple', 'watermelon']
+    foods = list()
+
+    for _ in range(100):
+        foods.append(Thing(random.choice(items)))
+
+    for _ in range(5):
+        helpers.append(Person())
+
+    for helper in helpers:
+        helper.pickup_thing(random.choice(foods))
+
+    i = 0
+    while insanetruck.still_room() and i <= 10:
+        print i
+        load_the_truck(helpers,insanetruck, foods)
+        print "----------"
+        print insanetruck.accepts
+        print "----------"
+
+        i += 1
+        
+if __name__ == '__main__':
+    main()
